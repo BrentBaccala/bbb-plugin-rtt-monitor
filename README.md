@@ -6,6 +6,19 @@ rolling window (default 10 minutes). It is the in-meeting, glance-able
 counterpart to the after-the-fact `rtt-report` / `rtt-plot` tools in
 `~/collaborate/scripts/`.
 
+## Demo
+
+Moderator view, live — each dot is one `/rtt-check` sample (~every 10 s); the
+time axis scrolls left as the window advances and old samples drop off:
+
+![Live connection-RTT monitor time-lapse](assets/rtt-timelapse.gif)
+
+A single frame — a healthy two-participant meeting (both sitting at ~7 ms on
+the LAN). A degraded client would climb toward the dashed warning / danger /
+critical reference lines, standing out against the others:
+
+![Connection-RTT monitor still](assets/rtt-monitor.png)
+
 ## Why
 
 A moderator currently has no easy way to see, live, that a specific
