@@ -148,6 +148,10 @@ hash from `git rev-parse --short HEAD`, which only advances when you commit —
 so if you build with uncommitted changes, the new code ships under the
 *previous* release's filename and clients keep serving the old cached bundle.
 
+This only matters when you've **changed the code**. Rebuilding an unchanged
+checkout is fine without a new commit — the current commit's hash already
+matches what's deployed, so there's nothing new to cache-bust.
+
 ## Package
 
 ```bash
