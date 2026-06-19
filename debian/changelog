@@ -1,3 +1,15 @@
+bbb-plugin-rtt-monitor (0.1.0-3) unstable; urgency=medium
+
+  * debconf: on install, ask whether to enable a full 10-minute RTT history.
+    On yes, set public.stats.lastEntriesCap=64 in the
+    /etc/bigbluebutton/bbb-html5.yml override using yq (the same tool BBB uses
+    for its own YAML config; added to Depends). Never edits the packaged
+    settings.yml and never restarts BigBlueButton — only prints a restart
+    reminder. Purge removes the key again.
+  * Drop the rtt-plot reference from the package description.
+
+ -- Brent Baccala <cosine@freesoft.org>  Thu, 18 Jun 2026 20:30:00 -0400
+
 bbb-plugin-rtt-monitor (0.1.0-2) unstable; urgency=medium
 
   * Scrolling time axis: x-axis ticks are now anchored to wall-clock

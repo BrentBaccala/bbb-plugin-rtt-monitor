@@ -6,7 +6,7 @@ Build-Depends: debhelper-compat (= 13), nodejs, npm
 
 Package: bbb-plugin-rtt-monitor
 Architecture: all
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, yq
 Description: BigBlueButton moderator connection-RTT monitor plugin
  A moderator-only BigBlueButton v3.0 plugin that plots every
  participant's network round-trip time (RTT) to the server, live,
@@ -18,5 +18,4 @@ Description: BigBlueButton moderator connection-RTT monitor plugin
  the rows to all meeting users for a moderator and to own-rows only
  for a viewer, so the moderator-only visibility is enforced
  server-side. The graph is a per-user scatter on a log RTT axis with
- the BBB warning/danger/critical thresholds drawn in, matching the
- after-the-fact rtt-plot tool.
+ the BBB warning/danger/critical thresholds drawn in.

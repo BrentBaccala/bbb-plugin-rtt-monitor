@@ -1,0 +1,18 @@
+Template: bbb-plugin-rtt-monitor/set-lastentriescap
+Type: boolean
+Default: true
+Description: Enable a full 10-minute RTT history?
+ The monitor backfills its graph from BigBlueButton's connection-status
+ history, which by default keeps only the last 20 samples per user
+ (~3 minutes at the ~10-second probe cadence). For a full 10 minutes of
+ history to appear the instant a moderator opens the panel, the cap
+ public.stats.lastEntriesCap must be raised.
+ .
+ If you accept, public.stats.lastEntriesCap will be set to 64 (~10.5 min)
+ in /etc/bigbluebutton/bbb-html5.yml. A BigBlueButton restart is required
+ for it to take effect; this package will NOT restart BigBlueButton for
+ you (that would disconnect any live meeting) — it only prints a reminder.
+ .
+ Decline to leave the cap unchanged: the monitor still works, it just
+ fills its window over the first few minutes the panel is open instead of
+ showing the full history immediately.

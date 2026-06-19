@@ -23,4 +23,16 @@ case "$1" in
         ;;
 esac
 
+# On purge only, undo the lastEntriesCap key this package may have added.
+# (remove keeps config; purge reverts it.) yq's del is a no-op if absent.
+case "$1" in
+    purge)
+        HTML5_YML=/etc/bigbluebutton/bbb-html5.yml
+        if [ -f "$HTML5_YML" ] && command -v yq >/dev/null 2>&1; then
+            yq eval -i 'del(.public.stats.lastEntriesCap)' "$HTML5_YML"
+            echo "bbb-plugin-rtt-monitor: removed public.stats.lastEntriesCap from $HTML5_YML"
+        fi
+        ;;
+esac
+
 #DEBHELPER#

@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+. /usr/share/debconf/confmodule
+
+# Only worth asking where the override file exists (i.e. a BBB host).
+if [ -f /etc/bigbluebutton/bbb-html5.yml ]; then
+    db_input medium bbb-plugin-rtt-monitor/set-lastentriescap || true
+    db_go || true
+fi
+
+#DEBHELPER#
