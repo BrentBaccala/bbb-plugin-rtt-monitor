@@ -82,7 +82,7 @@ plugin — **pick one**, you don't need both:
 ### Download the `.deb`
 
 Download the latest `.deb` from the apt repo's package directory —
-<http://u24.freesoft.org/jammy-300/pool/main/b/bbb-plugin-rtt-monitor/> — then
+<https://www.freesoft.org/jammy-300/pool/main/b/bbb-plugin-rtt-monitor/> — then
 install it and restart so bbb-web picks up the new plugin manifest (a running
 meeting won't load a newly installed plugin until BBB restarts or a new meeting
 starts):
@@ -99,11 +99,11 @@ Add it once, then install and upgrade with `apt`:
 
 ```bash
 # trust the repo's signing key
-curl -fsSL http://u24.freesoft.org/jammy-300/freesoft.asc \
+curl -fsSL https://www.freesoft.org/jammy-300/freesoft.asc \
   | sudo gpg --dearmor -o /usr/share/keyrings/freesoft.gpg
 
 # register the repo
-echo 'deb [signed-by=/usr/share/keyrings/freesoft.gpg] http://u24.freesoft.org/jammy-300 bigbluebutton-jammy main' \
+echo 'deb [signed-by=/usr/share/keyrings/freesoft.gpg] https://www.freesoft.org/jammy-300 bigbluebutton-jammy main' \
   | sudo tee /etc/apt/sources.list.d/freesoft.list
 
 sudo apt update
