@@ -72,6 +72,15 @@ session.
 
 ## Install
 
+Install on a **BigBlueButton 3.0** server. There are two ways to install the
+plugin — **pick one**, you don't need both:
+
+- **[Download the `.deb`](#download-the-deb)** — quickest for a one-off install.
+- **[Add the apt repo](#from-the-apt-repo)** — installs the same package and
+  also gets you `apt upgrade` for future versions.
+
+### Download the `.deb`
+
 Download the latest `.deb` from the apt repo's package directory —
 <http://u24.freesoft.org/jammy-300/pool/main/b/bbb-plugin-rtt-monitor/> — then
 install it and restart so bbb-web picks up the new plugin manifest (a running
