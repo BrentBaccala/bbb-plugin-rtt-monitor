@@ -9,12 +9,6 @@
       "type": "number",
       "required": false,
       "defaultValue": 10
-    },
-    {
-      "name": "sampleIntervalMs",
-      "type": "number",
-      "required": false,
-      "defaultValue": 10000
     }
   ]
 }

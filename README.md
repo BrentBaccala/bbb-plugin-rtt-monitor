@@ -2,22 +2,17 @@
 
 A **moderator-only** BigBlueButton v3.0 plugin that shows a live graph of
 every participant's network round-trip time (RTT) to the server, over a
-rolling window (default 10 minutes). It is the in-meeting, glance-able
-counterpart to the after-the-fact `rtt-report` / `rtt-plot` tools in
-`~/collaborate/scripts/`.
+rolling window (default 10 minutes).
 
 ## Demo
 
 Moderator view, live — each dot is one `/rtt-check` sample (~every 10 s); the
-time axis scrolls left as the window advances and old samples drop off:
+time axis scrolls left as the window advances and old samples drop off. Here
+two participants sit at a healthy ~7 ms; a degraded client would climb toward
+the dashed warning / danger / critical reference lines, standing out against
+the others:
 
-![Live connection-RTT monitor time-lapse](assets/rtt-timelapse.gif)
-
-A single frame — a healthy two-participant meeting (both sitting at ~7 ms on
-the LAN). A degraded client would climb toward the dashed warning / danger /
-critical reference lines, standing out against the others:
-
-![Connection-RTT monitor still](assets/rtt-monitor.png)
+![Live connection-RTT monitor](assets/rtt-timelapse.gif)
 
 ## Why
 
@@ -60,8 +55,7 @@ session.
   connected lines — isolated spikes read better as points). Log y-axis
   (`10 ms … 15 s`), one color per user, legend with name + median + peak,
   and the BBB `public.stats.rtt` thresholds drawn as reference lines:
-  warning 500 ms, danger 1 s, critical 2 s. These conventions match
-  `rtt-plot` so the live view and the report look consistent.
+  warning 500 ms, danger 1 s, critical 2 s.
 
 - **Charting approach**: a **hand-rolled SVG scatter** (no chart library).
   The plot is a log-scaled scatter with a handful of reference lines — too
@@ -82,31 +76,28 @@ session.
 
 For the default 10-minute window to be populated *immediately* on open
 (rather than filling in over the first ~10 min the panel is open), raise the
-history cap. The cap lives under `public.stats` in the deployed client
-settings. On BBB 3.0 (verified on 3.0-1672 / jammy-300) the file is:
+history cap, `public.stats.lastEntriesCap`. A stock BBB `settings.yml` ships
+the `stats:` block **without** this key (the schema default is 20 ≈ 3.3 min
+at the ~10 s probe cadence).
+
+Set it in the client-settings **override** file rather than editing the
+packaged `settings.yml` — on BBB 3.0 (verified on **3.0.29**) that is:
 
 ```
-/usr/share/bigbluebutton/html5-client/private/config/settings.yml
+/etc/bigbluebutton/bbb-html5.yml
 ```
 
-(older / meteor-bundle layouts use
-`/usr/share/meteor/bundle/programs/server/assets/app/config/settings.yml`).
-Add `lastEntriesCap` inside the existing `stats:` block — note that a stock
-3.0 settings.yml ships the `stats:` block **without** a `lastEntriesCap`
-key at all, so you are adding it:
+This file is deep-merged over the packaged settings, so add only the key you
+want under the existing `public:` block (create the `stats:` child if it
+isn't already there):
 
 ```yaml
 public:
   stats:
-    rtt:
-      warning: 500
-      danger: 1000
-      critical: 2000
-    help: STATS_HELP_URL
-    lastEntriesCap: 64   # ≈ 10.5 min at 10 s cadence (default in schema is 20 ≈ 3.3 min)
+    lastEntriesCap: 64   # ≈ 10.5 min at the ~10 s probe cadence
 ```
 
-The history-trim trigger in `bbb_schema.sql`
+The history-trim trigger in BBB's schema
 (`update_user_connectionStatus_trigger_func`) reads this per-meeting from
 `meeting_clientSettings.clientSettingsJson->'public'->'stats'->'lastEntriesCap'`
 and keeps only the most-recent N rows per `(meetingId, userId, sessionToken)`
@@ -137,19 +128,25 @@ Optional plugin settings (set in `/etc/bigbluebutton/bbb-html5.yml` under the
 plugin's entry; read by bbb-apps-akka at startup, so an akka restart is needed
 to change them):
 
-| Setting           | Type   | Default | Meaning                                      |
-|-------------------|--------|---------|----------------------------------------------|
-| `windowMinutes`   | number | `10`    | Rolling plot window, in minutes.             |
-| `sampleIntervalMs`| number | `10000` | Probe cadence hint (informational).          |
+| Setting         | Type   | Default | Meaning                                                                                          |
+|-----------------|--------|---------|--------------------------------------------------------------------------------------------------|
+| `windowMinutes` | number | `10`    | Width of the rolling time window the chart shows. Samples older than this scroll off the left edge. (The probe cadence itself is fixed by BBB at ~10 s and is not configured here.) |
 
 ## Build
 
 ```bash
-git commit ...        # commit FIRST — webpack names the JS bundle from
-                      # `git rev-parse --short HEAD` (cache-busting)
+git commit ...        # commit FIRST (see note below)
 npm install
 npm run build         # → dist/RttMonitor-<hash>.js, dist/manifest.json, dist/locales/
 ```
+
+**Why commit first?** The build embeds the short git commit hash in the bundle
+filename (`RttMonitor-<hash>.js`) and writes that name into `manifest.json`.
+That hash is what makes the URL change between releases, so browsers and any
+CDN fetch the new bundle instead of a stale cached copy. `webpack` reads the
+hash from `git rev-parse --short HEAD`, which only advances when you commit —
+so if you build with uncommitted changes, the new code ships under the
+*previous* release's filename and clients keep serving the old cached bundle.
 
 ## Package
 
@@ -157,22 +154,32 @@ npm run build         # → dist/RttMonitor-<hash>.js, dist/manifest.json, dist/
 dpkg-buildpackage -us -uc -b      # builds bbb-plugin-rtt-monitor_<ver>_all.deb
 ```
 
-Bump `debian/changelog` on every rebuild so `apt upgrade` installs it.
+## Install
 
-## Install / publish
-
-Install on a test box (jammy-300):
+Install the package directly, then restart so bbb-web picks up the new plugin
+manifest (a running meeting won't load a newly installed plugin until BBB
+restarts or a new meeting starts):
 
 ```bash
-scp ../bbb-plugin-rtt-monitor_*_all.deb ubuntu@jammy-300.samsung:
-ssh ubuntu@jammy-300.samsung 'sudo apt install -y ./bbb-plugin-rtt-monitor_*_all.deb && sudo bbb-conf --restart'
+sudo dpkg -i bbb-plugin-rtt-monitor_<ver>_all.deb
+sudo bbb-conf --restart
 ```
 
-Publish to the collaborate apt repo (do **not** publish to production from a
-task without confirmation):
+### From the apt repo
+
+This plugin and related BigBlueButton packages are also hosted in an apt repo.
+Add it once, then install and upgrade with `apt`:
 
 ```bash
-cd ~/website/jammy-300
-reprepro includedeb bigbluebutton-jammy /path/to/bbb-plugin-rtt-monitor_*_all.deb
-cd ~/collaborate && make rsync
+# trust the repo's signing key
+curl -fsSL http://u24.freesoft.org/jammy-300/freesoft.asc \
+  | sudo gpg --dearmor -o /usr/share/keyrings/freesoft.gpg
+
+# register the repo
+echo 'deb [signed-by=/usr/share/keyrings/freesoft.gpg] http://u24.freesoft.org/jammy-300 bigbluebutton-jammy main' \
+  | sudo tee /etc/apt/sources.list.d/freesoft.list
+
+sudo apt update
+sudo apt install bbb-plugin-rtt-monitor
+sudo bbb-conf --restart
 ```
