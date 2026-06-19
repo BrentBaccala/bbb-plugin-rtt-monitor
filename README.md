@@ -70,6 +70,38 @@ session.
   degrades gracefully (shows however much history exists) on deployments
   where the cap was left at its default.
 
+## Install
+
+Download the latest `.deb` from the apt repo's package directory —
+<http://u24.freesoft.org/jammy-300/pool/main/b/bbb-plugin-rtt-monitor/> — then
+install it and restart so bbb-web picks up the new plugin manifest (a running
+meeting won't load a newly installed plugin until BBB restarts or a new meeting
+starts):
+
+```bash
+sudo dpkg -i bbb-plugin-rtt-monitor_<ver>_all.deb
+sudo bbb-conf --restart
+```
+
+### From the apt repo
+
+This plugin and related BigBlueButton packages are also hosted in an apt repo.
+Add it once, then install and upgrade with `apt`:
+
+```bash
+# trust the repo's signing key
+curl -fsSL http://u24.freesoft.org/jammy-300/freesoft.asc \
+  | sudo gpg --dearmor -o /usr/share/keyrings/freesoft.gpg
+
+# register the repo
+echo 'deb [signed-by=/usr/share/keyrings/freesoft.gpg] http://u24.freesoft.org/jammy-300 bigbluebutton-jammy main' \
+  | sudo tee /etc/apt/sources.list.d/freesoft.list
+
+sudo apt update
+sudo apt install bbb-plugin-rtt-monitor
+sudo bbb-conf --restart
+```
+
 ## Server configuration
 
 ### 10-minute window: bump `lastEntriesCap`
@@ -156,36 +188,4 @@ matches what's deployed, so there's nothing new to cache-bust.
 
 ```bash
 dpkg-buildpackage -us -uc -b      # builds bbb-plugin-rtt-monitor_<ver>_all.deb
-```
-
-## Install
-
-Download the latest `.deb` from the apt repo's package directory —
-<http://u24.freesoft.org/jammy-300/pool/main/b/bbb-plugin-rtt-monitor/> — then
-install it and restart so bbb-web picks up the new plugin manifest (a running
-meeting won't load a newly installed plugin until BBB restarts or a new meeting
-starts):
-
-```bash
-sudo dpkg -i bbb-plugin-rtt-monitor_<ver>_all.deb
-sudo bbb-conf --restart
-```
-
-### From the apt repo
-
-This plugin and related BigBlueButton packages are also hosted in an apt repo.
-Add it once, then install and upgrade with `apt`:
-
-```bash
-# trust the repo's signing key
-curl -fsSL http://u24.freesoft.org/jammy-300/freesoft.asc \
-  | sudo gpg --dearmor -o /usr/share/keyrings/freesoft.gpg
-
-# register the repo
-echo 'deb [signed-by=/usr/share/keyrings/freesoft.gpg] http://u24.freesoft.org/jammy-300 bigbluebutton-jammy main' \
-  | sudo tee /etc/apt/sources.list.d/freesoft.list
-
-sudo apt update
-sudo apt install bbb-plugin-rtt-monitor
-sudo bbb-conf --restart
 ```
