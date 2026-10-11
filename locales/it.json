@@ -1,0 +1,6 @@
+{
+  "RttMonitor.launch": "Monitor RTT della connessione",
+  "RttMonitor.title": "RTT della connessione (tempo di andata e ritorno della rete verso il server)",
+  "RttMonitor.close": "Chiudi",
+  "RttMonitor.noData": "Nessun campione RTT ancora disponibile — in attesa del prossimo rilevamento (~10 s)…"
+}
